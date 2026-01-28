@@ -1,0 +1,81 @@
+[project]
+name = "birdpipe"
+version = "0.1.0"
+description = "Multi-modal audio analysis system for bird and bat species detection with GPS-tagged observations"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "BirdPipe Contributors"}
+]
+keywords = ["bird", "bat", "wildlife", "monitoring", "audio", "classification", "birdnet", "bioacoustics", "gps", "geojson"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "meshtastic>=2.5.9",
+    "numpy==1.26.4",
+    "tensorflow",
+    "tflite-runtime",
+    "audioread",
+    "protobuf>=4.25.5",
+    "pandas==2.1.4",
+    "python-dateutil==2.9.0.post0",
+    "pytz==2024.2",
+    "tzdata==2024.2",
+    "cffi==1.17.1",
+    "pycparser==2.22",
+    "sounddevice==0.5.1",
+    "soundfile==0.13.0",
+    "tensorflow-cpu-aws==2.14.0",
+    "decorator==5.1.1",
+    "joblib==1.4.2",
+    "lazy-loader==0.4",
+    "librosa==0.10.2.post1",
+    "llvmlite==0.43.0",
+    "msgpack==1.1.0",
+    "numba==0.60.0",
+    "platformdirs==4.3.6",
+    "pooch==1.8.2",
+    "psutil==6.1.0",
+    "scikit-learn==1.6.1",
+    "scipy==1.15.1",
+    "soxr==0.5.0.post1",
+    "threadpoolctl==3.5.0",
+    "affine==2.4.0",
+    "attrs==24.3.0",
+    "click>=8.1.0",
+    "click-plugins==1.1.1",
+    "cligj==0.7.2",
+    "pyparsing==3.2.1",
+    "rasterio==1.4.3",
+    "resampy==0.4.3",
+    "rpi-gpio==0.7.1",
+    "speedtest-cli==2.1.3",
+    "tomli>=2.0.0;python_version<'3.11'",
+    "tomli-w>=1.0.0",
+]
+
+[project.scripts]
+birdpipe = "command.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+    "mypy>=1.0.0"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["command"]

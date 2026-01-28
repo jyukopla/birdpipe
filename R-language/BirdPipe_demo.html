@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Anonymized" />
+
+<meta name="date" content="2026-01-27" />
+
+<title>BirdPipe demo</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">BirdPipe demo</h1>
+<h4 class="author">Anonymized</h4>
+<h4 class="date">2026-01-27</h4>
+
+
+
+<p>This vignette demonstrates the use of the <code>BirdPipe</code>
+R-package using the example data provided. To run the vignette, the
+working directory needs to contain the folder <code>data</code>, which
+should further contain the example data (folder
+<code>BirdPipe_demo_data</code>) as well as the example background map
+(file <code>LU_data.tif</code>). The example data folder should contain
+the sub-folder <code>geojson</code> that contain the metadata and
+species classifications as <code>.geojson</code> files, as well as the
+sub-folder <code>audio</code> that contains the audio as
+<code>.wav</code> files.</p>
+<div id="loading-the-package" class="section level2">
+<h2>Loading the package</h2>
+<p>We start by loading the <code>BirdPipe</code> R-package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(BirdPipe)</span></code></pre></div>
+</div>
+<div id="loading-the-data" class="section level2">
+<h2>Loading the data</h2>
+<p>We define the folder where the data are and then apply the
+<code>load_data</code> function to load the geojson data.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>BirdPipe.folder <span class="ot">=</span> <span class="st">&quot;BirdPipe_demo_data&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>BirdPipe.data <span class="ot">=</span> BirdPipe<span class="sc">::</span><span class="fu">load_data</span>(<span class="at">BirdPipe.folder =</span> BirdPipe.folder)</span></code></pre></div>
+<p>The resulting object is a named list that contains
+<code>recordings</code> and <code>detections</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">names</span>(BirdPipe.data)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;recordings&quot; &quot;detections&quot;</span></span></code></pre></div>
+</div>
+<div id="plotting-the-data" class="section level2">
+<h2>Plotting the data</h2>
+<p>We use the <code>plot_recordings</code> functions to plot the
+recordings as timeline and as a map:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>BirdPipe<span class="sc">::</span><span class="fu">plot_recordings</span>(<span class="at">BirdPipe.data =</span> BirdPipe.data)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>The “recording timeline” -plot on the left shows the recordings as
+dots, where the color refers to the segment to which the recording
+belongs to. There are two segments (black and red colors), each of which
+consist of four one-minute long recordings. The x-axis shows the time of
+the recording, and the y-axis shows the BirdPipe device. Here we have
+used two BirdPipe devices, each for one segment.</p>
+<p>The “recording locations” -plot on the right shows the segments on a
+map based on their latitude and longitude.</p>
+<p>To illustrate some plotting options, here we show the recording
+locations on a background map of land use categories, the number of
+species detected in each segment, and the segment names.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>background.map <span class="ot">=</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">&quot;BirdPipe_demo_data/LU.tif&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>BirdPipe<span class="sc">::</span><span class="fu">plot_recordings</span>(<span class="at">BirdPipe.data =</span> BirdPipe.data,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                <span class="at">background.map =</span> background.map,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                <span class="at">show.map =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>                <span class="at">show.timeline =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>                <span class="at">show.number.of.species =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>                <span class="at">show.segment.id =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>We next use the function <code>plot_detections</code> to plot a
+timeline of the detections:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>BirdPipe<span class="sc">::</span><span class="fu">plot_detections</span>(<span class="at">BirdPipe.data =</span> BirdPipe.data)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt; [1] &quot;Numbers of detections:&quot;
+#&gt; 
+#&gt;     Eurasian Blue Tit    Eurasian Bullfinch       Eurasian Siskin 
+#&gt;                     1                     4                     1 
+#&gt; Eurasian Tree Sparrow   European Greenfinch             Goldcrest 
+#&gt;                     3                     1                     1 
+#&gt;             Great Tit               Mallard 
+#&gt;                     1                     1</code></pre>
+<p>Here the dots show the edge-computing based detections of each bird
+species. The detections of each species are colored and connected by a
+line to facilitate their visual separation.</p>
+<p>The input arguments of the function can be used to e.g. show
+scientific names instead of common names, to order the specides
+according to the number of detections, and to include only detections
+that exceed a the probability threshold 0.9 and thus that can be
+considered somewhat reliable. Here we also add a small amount of random
+jitter to show overlapping data points (simultanous detection in two
+locations).</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>BirdPipe<span class="sc">::</span><span class="fu">plot_detections</span>(<span class="at">BirdPipe.data =</span> BirdPipe.data,</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>                <span class="at">name.to.use =</span> <span class="st">&quot;scientific_name&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                <span class="at">species.order =</span> <span class="st">&quot;number_of_detections&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                <span class="at">threshold =</span> <span class="fl">0.9</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>                <span class="at">jitter =</span> <span class="fl">0.2</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt; [1] &quot;Numbers of detections:&quot;
+#&gt; 
+#&gt;   Passer montanus Pyrrhula pyrrhula   Chloris chloris 
+#&gt;                 2                 2                 1</code></pre>
+</div>
+<div id="extracting-the-community-data-matrix" class="section level2">
+<h2>Extracting the community data matrix</h2>
+<p>The BirdPipe data are structured as segments, each of which can
+contain multiple recordings. For example, in the case study included in
+the BirdPipe paper, we consider as one segment a 24 hour period, during
+which we have recorded one minute every fifteen minutes. We expect the
+BirdPipe user to be typically interested in the question of “which
+species were detected in which segment”. The user may e.g. wish to
+compile segment-specific species lists, or use the segments as sampling
+units in some downstream statistical analysis. Such a species times
+sampling units matrix is often called the community data matrix. This
+matrix can be extracted with the function
+<code>extract_community_matrix</code>. Here we include only those
+detections that exceed the probability threshold of 0.5.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>Y.edge.computing <span class="ot">=</span> BirdPipe<span class="sc">::</span><span class="fu">extract_community_matrix</span>(<span class="at">BirdPipe.data =</span> BirdPipe.data,</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>                                    <span class="at">threshold =</span> <span class="fl">0.5</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="fu">kable</span>(Y.edge.computing, <span class="at">caption =</span> <span class="st">&quot;Community data matrix based on edge computing&quot;</span>)</span></code></pre></div>
+<table style="width:100%;">
+<caption>Community data matrix based on edge computing</caption>
+<colgroup>
+<col width="24%" />
+<col width="16%" />
+<col width="14%" />
+<col width="19%" />
+<col width="17%" />
+<col width="7%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Eurasian Bullfinch</th>
+<th align="right">Eurasian Siskin</th>
+<th align="right">Eurasian Tree Sparrow</th>
+<th align="right">European Greenfinch</th>
+<th align="right">Mallard</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">field-3 2025-12-22 11:47:12</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">field-4 2025-12-22 11:28:03</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>The resulting community data matrix shows for each segment the number
+of recordings in which each species was detected.</p>
+</div>
+<div id="manual-validation-of-the-community-data-matrix" class="section level2">
+<h2>Manual validation of the community data matrix</h2>
+<p>Above, we named the community data matrix as
+<code>Y.edge.computing</code> as it is solely based on the machine
+learning classifications that the BirdPipe device has performed through
+edge computing. Such classifications are likely to include errors. The
+most reliable way to remove classification errors is through manual
+validation by an expert. With passive acoustic monitoring the data can
+contain excessive amounts of audio, making it unfeasible to go manually
+through all recordings. From the users perspective, often it is
+sufficient to validate just the community data matrix rather than each
+individual vocalization. To enable doing so in a cost-effective manner,
+BirdPipe implements the <code>highest_classification_per_segment</code>
+function, which finds for each non-zero entry of the community data
+matrix the vocalization with the highest classification probability.
+Here we restrict the search for vocalizations that exceed the
+probability threshold of 0.5 to be compatible with the community data
+matrix constructed above.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>highest.classifications <span class="ot">=</span> BirdPipe<span class="sc">::</span><span class="fu">highest_classification_per_segment</span>(<span class="at">BirdPipe.data =</span> BirdPipe.data,</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>                                                             <span class="at">threshold =</span> <span class="fl">0.5</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>                                                            <span class="at">manual.validation.file =</span> <span class="st">&quot;detections_to_validate.xlsx&quot;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="fu">names</span>(highest.classifications)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Eurasian Bullfinch&quot;    &quot;Eurasian Siskin&quot;       &quot;Eurasian Tree Sparrow&quot;</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt; [4] &quot;European Greenfinch&quot;   &quot;Mallard&quot;</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>highest.classifications[[<span class="st">&quot;Eurasian Bullfinch&quot;</span>]]</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt;                       segment                          audio_filename</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; 1 field-3 2025-12-22 11:47:12 field-3_2025-12-22T10_00_05.011224Z.wav</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; 2 field-4 2025-12-22 11:28:03 field-4_2025-12-22T10_05_03.011300Z.wav</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt;   probability offset_s</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; 1   0.9260905        2</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; 2   0.9358305       28</span></span></code></pre></div>
+<p>The resulting object is a named list that contains the species as its
+elements. For each species and segment, the object contains the
+information about in which audiofile and where in the audiofile (offset
+as seconds from the beginning of the recording) the vocalization with
+highest classification probability takes place.</p>
+<p>When applying the function
+<code>highest_classification_per_segment</code>, we used the argument
+´manual.validation.file´ to save the data into the excel file
+<code>detections_to_validate.xlsx</code>. In addition to the above
+described data, the file includes a column called
+<code>manual_validation</code> which has initially missing
+(<code>NA</code>) values for all cells, as exemplified here for the
+Eurasian Bullfinch:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">library</span>(xlsx)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>xlsx<span class="sc">::</span><span class="fu">read.xlsx</span>(<span class="at">file =</span><span class="st">&quot;detections_to_validate.xlsx&quot;</span>, <span class="at">sheetIndex =</span> <span class="st">&quot;Eurasian Bullfinch&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt;                       segment                          audio_filename</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; 1 field-3 2025-12-22 11:47:12 field-3_2025-12-22T10_00_05.011224Z.wav</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; 2 field-4 2025-12-22 11:28:03 field-4_2025-12-22T10_05_03.011300Z.wav</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt;   probability offset_s manual_validation</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; 1   0.9260905        2                NA</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; 2   0.9358305       28                NA</span></span></code></pre></div>
+<p>The task of the user is then to fill in the
+<code>manual_validation</code> column. The user may use e.g. the letters
+<code>Y</code> (yes) and <code>N</code> (no) to indicate cases where the
+species was or was not present, and <code>YM</code> (yes, maybe) and
+<code>NM</code> (no, maybe) to indicate cases where the user is not
+certain. The user may utilize the <code>play_sound</code> function to
+play the vocalizations of highest probability. If you are a Mac user,
+the script below may give a “Permission denied” error. If this happens,
+you may need to set the folder where the audio player is located by
+calling e.g. <code>tuneR::setWavPlayer(&quot;/usr/bin/afplay&quot;)</code>. When
+the code runs successfully, the vocalizations to be validated are
+sequentially played with an audio player while the information about
+which vocalization is to be validated is shown in the console.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>spp <span class="ot">=</span> <span class="fu">names</span>(highest.classifications)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="cf">for</span>(sp <span class="cf">in</span> spp){</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;species to be validated: &quot;</span>,sp))</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  da <span class="ot">=</span> highest.classifications[[sp]]</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(da)){</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>    <span class="fu">print</span>(da[i,])</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>      BirdPipe<span class="sc">::</span><span class="fu">play_sound</span>(<span class="at">BirdPipe.folder =</span> BirdPipe.folder,</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>                 <span class="at">audio_folder =</span> <span class="st">&quot;audio&quot;</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>                 <span class="at">audio_filename =</span> da<span class="sc">$</span>audio_filename[i],</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>                 <span class="at">offset =</span> da<span class="sc">$</span>offset_s[i])</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>      }</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>#&gt; [1] &quot;species to be validated: Eurasian Bullfinch&quot;
+#&gt;                       segment                          audio_filename
+#&gt; 1 field-3 2025-12-22 11:47:12 field-3_2025-12-22T10_00_05.011224Z.wav
+#&gt;   probability offset_s
+#&gt; 1   0.9260905        2
+#&gt;                       segment                          audio_filename
+#&gt; 2 field-4 2025-12-22 11:28:03 field-4_2025-12-22T10_05_03.011300Z.wav
+#&gt;   probability offset_s
+#&gt; 2   0.9358305       28
+#&gt; [1] &quot;species to be validated: Eurasian Siskin&quot;
+#&gt;                       segment                          audio_filename
+#&gt; 1 field-3 2025-12-22 11:47:12 field-3_2025-12-22T09_55_07.009251Z.wav
+#&gt;   probability offset_s
+#&gt; 1   0.5229462        0
+#&gt; [1] &quot;species to be validated: Eurasian Tree Sparrow&quot;
+#&gt;                       segment                          audio_filename
+#&gt; 1 field-3 2025-12-22 11:47:12 field-3_2025-12-22T10_00_05.011224Z.wav
+#&gt;   probability offset_s
+#&gt; 1   0.9647898       36
+#&gt;                       segment                          audio_filename
+#&gt; 2 field-4 2025-12-22 11:28:03 field-4_2025-12-22T10_00_03.016769Z.wav
+#&gt;   probability offset_s
+#&gt; 2   0.9644651       32
+#&gt; [1] &quot;species to be validated: European Greenfinch&quot;
+#&gt;                       segment                          audio_filename
+#&gt; 1 field-4 2025-12-22 11:28:03 field-4_2025-12-22T10_10_03.010193Z.wav
+#&gt;   probability offset_s
+#&gt; 1   0.9374611       28
+#&gt; [1] &quot;species to be validated: Mallard&quot;
+#&gt;                       segment                          audio_filename
+#&gt; 1 field-3 2025-12-22 11:47:12 field-3_2025-12-22T10_05_05.011485Z.wav
+#&gt;   probability offset_s
+#&gt; 1   0.5618742        2</code></pre>
+<p>We assume that the user has copied the file
+<code>detections_to_validate.xlsx</code> with the name
+<code>detections_validated.xlsx</code>, and then filled in the
+validation data by entering the values while listening through the
+highest classifications utilizing the <code>play_sound</code> function
+and following from the printed output shown above the segment and
+species in question. This is how the file with expert validations looks
+like for the example species of the Eurasian Bullfinch:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>xlsx<span class="sc">::</span><span class="fu">read.xlsx</span>(<span class="at">file =</span><span class="st">&quot;detections_validated.xlsx&quot;</span>, <span class="at">sheetIndex =</span> <span class="st">&quot;Eurasian Bullfinch&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt;                       segment                          audio_filename</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; 1 field-3 2025-12-22 11:47:12 field-3_2025-12-22T10_00_05.011224Z.wav</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt; 2 field-4 2025-12-22 11:28:03 field-4_2025-12-22T10_05_03.011300Z.wav</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt;   probability offset_s manual_validation</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt; 1   0.9260905        2                 Y</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co">#&gt; 2   0.9358305       28                 Y</span></span></code></pre></div>
+<p>We next use the <code>extract_validated_community_matrix</code>
+function to read in the validation file and extract a community matrix
+based on the expert validations, considering here both <code>Y</code>
+and <code>YM</code> as validated vocalizations:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>Y.expert <span class="ot">=</span> BirdPipe<span class="sc">::</span><span class="fu">extract_validated_community_matrix</span>(<span class="at">BirdPipe.data =</span> BirdPipe.data,</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>                                      <span class="at">manual.validation.file =</span> <span class="st">&quot;detections_validated.xlsx&quot;</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>                                             <span class="at">validated =</span> <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>,<span class="st">&quot;YM&quot;</span>))</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="fu">kable</span>(Y.expert , <span class="at">caption =</span> <span class="st">&quot;Community data matrix based on expert validation&quot;</span>)</span></code></pre></div>
+<table style="width:100%;">
+<caption>Community data matrix based on expert validation</caption>
+<colgroup>
+<col width="24%" />
+<col width="16%" />
+<col width="14%" />
+<col width="19%" />
+<col width="17%" />
+<col width="7%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Eurasian Bullfinch</th>
+<th align="right">Eurasian Siskin</th>
+<th align="right">Eurasian Tree Sparrow</th>
+<th align="right">European Greenfinch</th>
+<th align="right">Mallard</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">field-3 2025-12-22 11:47:12</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">field-4 2025-12-22 11:28:03</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>This matrix contains ones for cases where the species was detected by
+edge computing and was validated by an expert. We may multiply this
+matrix with the matrix <code>Y.edge.computing</code> to keep the
+abundance about how many times each species was detected, yet keeping
+only segment-species combinations for which there is a validated
+detection. We also remove species for which there are no validated
+detections. This results in the final community data matrix that we
+recommend to be used as a starting point for downstream analyses.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>Y <span class="ot">=</span> Y.edge.computing<span class="sc">*</span>Y.expert</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>Y <span class="ot">=</span> Y[,<span class="fu">colSums</span>(Y)<span class="sc">&gt;</span><span class="dv">0</span>]</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="fu">kable</span>(Y, <span class="at">caption =</span> <span class="st">&quot;Final community data matrix for downstream analyses&quot;</span>)</span></code></pre></div>
+<table style="width:100%;">
+<caption>Final community data matrix for downstream analyses</caption>
+<colgroup>
+<col width="31%" />
+<col width="21%" />
+<col width="24%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Eurasian Bullfinch</th>
+<th align="right">Eurasian Tree Sparrow</th>
+<th align="right">European Greenfinch</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">field-3 2025-12-22 11:47:12</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">field-4 2025-12-22 11:28:03</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<p>We note that even if the expert would not make any mistakes in the
+manual validation, the final community data matrix can still contain
+errors. Most importantly, the matrix may contain false negatives, i.e.,
+zero entries even if the species was actually there. This can happen if
+edge computing did not detect the species to start with, in which case
+the species was not included in manual validation. It can also happen if
+the classification with highest probability did not actually represent
+the species, but some other classification with lower probability would
+actually have represented the species. If the expert did not make any
+mistakes, there are no false positives in the sense that all non-zero
+entries correspond to actual presence of the species. However, the
+number of recordings in which the species is present is based on edge
+computing only, and hence likely to contain errors. In spite of these
+error sources, we consider the community data matrix constructed by the
+here illustrated procedure as a robust starting point for downstream
+analyses. To further reduce the possibility of errors, more extensive
+manual validation can be made, e.g. by listening through 10 tentative
+vocalizations per species and per segment and/or listening through a
+subset of audiofiles in their full length.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

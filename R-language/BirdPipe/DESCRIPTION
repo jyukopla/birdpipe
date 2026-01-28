@@ -1,0 +1,21 @@
+Package: BirdPipe
+Type: Package
+Title: R-package for managing the workflow with the BirdPipe recording
+        device
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "NN", "Anonymized",
+      email = "anonymized@email",
+      role = c("aut", "cre")
+    )
+  )
+Description: BirdPipe is an open-source recording device for automated data collection and classification of birds, bats and other vocal animals. This R-package helps managing the BirdPipe workflow.
+Imports: jsonlite, readxl, sonicscrewdriver, terra, tuneR, sf, xlsx
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.3.3
+NeedsCompilation: no
+Packaged: 2026-01-27 10:56:49 UTC; otovaska
+Author: NN Anonymized [aut, cre]
+Maintainer: NN Anonymized <anonymized@email>
