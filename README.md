@@ -465,9 +465,9 @@ Typical performance on Raspberry Pi 4 (8GB):
 ## BirdPipe R
 
 First, download the BirdPipe R package file named BirdPipe_0.1.0.tar.gz from birdpipe/R-language. Then install the package in R by running:
-'''bash
+```bash
 install.packages("BirdPipe_0.1.0.tar.gz", repos = NULL, type = "source")
-'''
+```
 To run the software demonstration vignette (BirdPipe_demo.Rmd), make sure that the folder BirdPipe_demo_data is located in the root directory of your R session before running the file.
 
 ## Support
