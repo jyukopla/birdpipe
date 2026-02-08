@@ -15,7 +15,7 @@ BirdNET: https://github.com/orgs/birdnet-team/
 All Python source code in the BirdPipe repository is licensed under the **MIT License**.
 
 ## Physical Device Assembly and FreeCAD Design Files
-The physical design of the BirdPipe device, including assembly documentation and FreeCAD work files, is licensed under the **CERN Open Hardware License (OHL)**.
+The physical design of the BirdPipe device, including assembly documentation and FreeCAD work files, is licensed under the **CERN Open Hardware License (OHL-P)**.
 
 ## RStudio Audio Analysis Packages
 The R packages used for audio recording analysis and data processing in RStudio are licensed under the **GNU General Public License v3 (GPL-3.0)**.
