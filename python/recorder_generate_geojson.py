@@ -63,7 +63,7 @@ def generate_geojson(
         "type": "Feature",
         "properties": {
             "device": device_name,
-            "segment": reboot_segment,
+            "sampling_event": reboot_segment,
             "timestamp": timestamp_str,
             "timestamp_ns": recording_time_unix_ns,
             "duration": duration,
@@ -108,7 +108,7 @@ def generate_geojson(
                     "species_class": detection["species_class"],
                     "species_name": detection["species_name"],
                     "scientific_name": detection["scientific_name"],
-                    "probability": detection["probability"],
+                    "classification_score": detection["probability"],
                     "offset_s": detection["timestamp_offset"],
                 }
                 model_entry["detections"].append(detection_entry)
