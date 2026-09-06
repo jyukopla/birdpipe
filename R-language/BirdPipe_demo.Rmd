@@ -29,6 +29,8 @@ We start by loading the `BirdPipe` R-package.
 library(BirdPipe)
 ```
 
+BirdPipe imports functions from the following packages: `jsonlite`, `readxl`, `writexl`, `sonicscrewdriver`, `terra`, `tuneR` and `sf`. Hence, these packages need to be installed to succesfully run BirdPipe.
+
 ## Loading the data
 
 We define the folder where the data are and then apply the `load_data` function to load the geojson data. 
@@ -51,11 +53,11 @@ We use the `plot_recordings` functions to plot the recordings as timeline and as
 BirdPipe::plot_recordings(BirdPipe.data = BirdPipe.data)
 ```
 
-The "recording timeline" -plot on the left shows the recordings as dots, where the color refers to the segment to which the recording belongs to. There are two segments (black and red colors), each of which consist of four one-minute long recordings. The x-axis shows the time of the recording, and the y-axis shows the BirdPipe device. Here we have used two BirdPipe devices, each for one segment.
+The "recording timeline" -plot on the left shows the recordings as dots, where the color refers to the sampling event to which the recording belongs to. There are two sampling events (black and red colors), each of which consist of four one-minute long recordings. The x-axis shows the time of the recording, and the y-axis shows the BirdPipe device. Here we have used two BirdPipe devices, each for one sampling event.
 
-The "recording locations" -plot on the right shows the segments on a map based on their latitude and longitude.
+The "recording locations" -plot on the right shows the sampling events on a map based on their latitude and longitude.
 
-To illustrate some plotting options, here we show the recording locations on a background map of land use categories, the number of species detected in each segment, and the segment names.
+To illustrate some plotting options, here we show the recording locations on a background map of land use categories, the number of species detected in each sampling event, and the sampling event names.
 
 ```{r}
 background.map = terra::rast("BirdPipe_demo_data/LU.tif")
@@ -64,7 +66,7 @@ BirdPipe::plot_recordings(BirdPipe.data = BirdPipe.data,
                 show.map = TRUE,
                 show.timeline = FALSE,
                 show.number.of.species = TRUE,
-                show.segment.id = TRUE)
+                show.sampling.event.id = TRUE)
 ```
 
 We next use the function `plot_detections` to plot a timeline of the detections:
@@ -75,7 +77,7 @@ BirdPipe::plot_detections(BirdPipe.data = BirdPipe.data)
 
 Here the dots show the edge-computing based detections of each bird species. The detections of each species are colored and connected by a line to facilitate their visual separation.
 
-The input arguments of the function can be used to e.g. show scientific names instead of common names, to order the specides according to the number of detections, and to include only detections that exceed a the probability threshold 0.9 and thus that can be considered somewhat reliable. Here we also add a small amount of random jitter to show overlapping data points (simultanous detection in two locations).
+The input arguments of the function can be used to e.g. show scientific names instead of common names, to order the specides according to the number of detections, and to include only detections that exceed a the classification score threshold 0.9 and thus that can be considered somewhat reliable. Here we also add a small amount of random jitter to show overlapping data points (simultanous detection in two locations).
 
 ```{r}
 BirdPipe::plot_detections(BirdPipe.data = BirdPipe.data,
@@ -87,7 +89,7 @@ BirdPipe::plot_detections(BirdPipe.data = BirdPipe.data,
 
 ## Extracting the community data matrix
 
-The BirdPipe data are structured as segments, each of which can contain multiple recordings. For example, in the case study included in the BirdPipe paper, we consider as one segment a 24 hour period, during which we have recorded one minute every fifteen minutes. We expect the BirdPipe user to be typically interested in the question of "which species were detected in which segment". The user may e.g. wish to compile segment-specific species lists, or use the segments as sampling units in some downstream statistical analysis. Such a species times sampling units matrix is often called the community data matrix. This matrix can be extracted with the function `extract_community_matrix`. Here we include only those detections that exceed the probability threshold of 0.5. 
+The BirdPipe data are structured as sampling events, each of which can contain multiple recordings. For example, in the case study included in the BirdPipe paper, we consider as one sampling event a 24 hour period, during which we have recorded one minute every fifteen minutes. We expect the BirdPipe user to be typically interested in the question of "which species were detected in which sampling event". The user may e.g. wish to compile sampling event-specific species lists, or use the sampling events as sampling units in some downstream statistical analysis. Such a species times sampling units matrix is often called the community data matrix. This matrix can be extracted with the function `extract_community_matrix`. Here we include only those detections that exceed the classification score threshold of 0.5. 
 
 ```{r}
 Y.edge.computing = BirdPipe::extract_community_matrix(BirdPipe.data = BirdPipe.data,
@@ -95,36 +97,38 @@ Y.edge.computing = BirdPipe::extract_community_matrix(BirdPipe.data = BirdPipe.d
 kable(Y.edge.computing, caption = "Community data matrix based on edge computing")
 ```
 
-The resulting community data matrix shows for each segment the number of recordings in which each species was detected.
+The resulting community data matrix shows for each sampling event the number of recordings in which each species was detected.
 
 ## Manual validation of the community data matrix
 
-Above, we named the community data matrix as `Y.edge.computing` as it is solely based on the machine learning classifications that the BirdPipe device has performed through edge computing. Such classifications are likely to include errors. The most reliable way to remove classification errors is through manual validation by an expert. With passive acoustic monitoring the data can contain excessive amounts of audio, making it unfeasible to go manually through all recordings. From the users perspective, often it is sufficient to validate just the community data matrix rather than each individual vocalization. To enable doing so in a cost-effective manner, BirdPipe implements the `highest_classification_per_segment` function, which finds for each non-zero entry of the community data matrix the vocalization with the highest classification probability. Here we restrict the search for vocalizations that exceed the probability threshold of 0.5 to be compatible with the community data matrix constructed above. 
+Above, we named the community data matrix as `Y.edge.computing` as it is solely based on the machine learning classifications that the BirdPipe device has performed through edge computing. Such classifications are likely to include errors. The most reliable way to remove classification errors is through manual validation by an expert. With passive acoustic monitoring the data can contain excessive amounts of audio, making it unfeasible to go manually through all recordings. From the users perspective, often it is sufficient to validate just the community data matrix rather than each individual vocalization. To enable doing so in a cost-effective manner, BirdPipe implements the `top_n_classifications` function, which finds for each non-zero entry of the community data matrix the  `n` vocalizations with the highest classification scores. Here we apply top-2 validation, and restrict the search for vocalizations that exceed the classification score threshold of 0.5 to be compatible with the community data matrix constructed above. 
 
 ```{r}
-highest.classifications = BirdPipe::highest_classification_per_segment(BirdPipe.data = BirdPipe.data,
-                                                             threshold = 0.5,
-                                                            manual.validation.file = "detections_to_validate.xlsx")
-names(highest.classifications)
-highest.classifications[["Eurasian Bullfinch"]]
+highest.classifications = BirdPipe::top_n_classifications(BirdPipe.data = BirdPipe.data,
+                                                          n = 2,
+                                                          threshold = 0.5,
+                                                          manual.validation.file = "detections_to_validate")
+names(highest.classifications[[1]])
+highest.classifications[[1]][["Eurasian Bullfinch"]]
 ```
 
-The resulting object is a named list that contains the species as its elements. For each species and segment, the object contains the information about in which audiofile and where in the audiofile (offset as seconds from the beginning of the recording) the vocalization with highest classification probability takes place.
+The resulting object is a list with `n` elements, with the first item corresponding to the highest classification scores, the second element to the second highest  scores, and so on. Each item is a named list that contains the species as its elements. For each species and sampling event, the object contains the information about in which audiofile and where in the audiofile (offset as seconds from the beginning of the recording) the vocalization with highest classification score takes place.
 
-When applying the function `highest_classification_per_segment`, we used the argument ´manual.validation.file´ to save the data into the excel file `detections_to_validate.xlsx`. In addition to the above described data, the file includes a column called `manual_validation` which has initially missing (`NA`) values for all cells, as exemplified here for the Eurasian Bullfinch:
+When applying the function `top_n_classifications`, we used the argument ´manual.validation.file´ to save the data for the highest classification scores into the excel file `detections_to_validate-1.xlsx`, and those for the second highest classification scores to `detections_to_validate-2.xlsx`. In addition to the above described data, the file includes a column called `manual_validation` which has initially missing (`NA`) values for all cells, as exemplified here for the Eurasian Bullfinch:
 
 ```{r}
 library(xlsx)
-xlsx::read.xlsx(file ="detections_to_validate.xlsx", sheetIndex = "Eurasian Bullfinch")
+xlsx::read.xlsx(file ="detections_to_validate-1.xlsx", sheetIndex = "Eurasian Bullfinch")
 ```
 
-The task of the user is then to fill in the `manual_validation` column. The user may use e.g. the letters `Y` (yes) and `N` (no) to indicate cases where the species was or was not present, and `YM` (yes, maybe) and `NM` (no, maybe) to indicate cases where the user is not certain. The user may utilize the `play_sound` function to play the vocalizations of highest probability. If you are a Mac user, the script below may give a "Permission denied" error. If this happens, you may need to set the folder where the audio player is located by calling e.g. `tuneR::setWavPlayer("/usr/bin/afplay")`. When the code runs successfully, the vocalizations to be validated are sequentially played with an audio player while the information about which vocalization is to be validated is shown in the console.
+The task of the user is then to fill in the `manual_validation` column. The user may use e.g. the letters `Y` (yes) and `N` (no) to indicate cases where the species was or was not present, and `YM` (yes, maybe) and `NM` (no, maybe) to indicate cases where the user is not certain. The script below enables the user to go through the classifications with the highest score, as selected with `classifications.to.validate = highest.classifications[[1]]`. In the script, the `play_sound` function is used to play the vocalizations of highest classification score. If you are a Mac user, the script below may give a "Permission denied" error. If this happens, you may need to set the folder where the audio player is located by calling e.g. `tuneR::setWavPlayer("/usr/bin/afplay")`. When the code runs successfully, the vocalizations to be validated are sequentially played with an audio player while the information about which vocalization is to be validated is shown in the console.
 
 ```{r,eval=FALSE}
-spp = names(highest.classifications)
+classifications.to.validate = highest.classifications[[1]]
+spp = names(classifications.to.validate)
 for(sp in spp){
   print(paste0("species to be validated: ",sp))
-  da = highest.classifications[[sp]]
+  da = classifications.to.validate[[sp]]
   for(i in 1:nrow(da)){
     print(da[i,])
       BirdPipe::play_sound(BirdPipe.folder = BirdPipe.folder,
@@ -145,22 +149,23 @@ for(sp in spp){
   }
 }
 ```
-We assume that the user has copied the file `detections_to_validate.xlsx` with the name `detections_validated.xlsx`, and then filled in the validation data by entering the values while listening through the highest classifications utilizing the `play_sound` function and following from the printed output shown above the segment and species in question. This is how the file with expert validations looks like for the example species of the Eurasian Bullfinch:
+We assume that the user has copied the files `detections_to_validate-1.xlsx` and `detections_to_validate-2.xlsx` with the names `detections_validated-1.xlsx` and `detections_validated-2.xlsx`, and then filled in the validation data by entering the values while listening through the highest classifications utilizing the script above. This is how the file with expert validations looks like for the example species of the Eurasian Bullfinch:
 
 ```{r}
-xlsx::read.xlsx(file ="detections_validated.xlsx", sheetIndex = "Eurasian Bullfinch")
+xlsx::read.xlsx(file ="detections_validated-1.xlsx", sheetIndex = "Eurasian Bullfinch")
 ```
 
-We next use the `extract_validated_community_matrix` function to read in the validation file and extract a community matrix based on the expert validations, considering here both `Y` and `YM` as validated vocalizations:
+We next use the `extract_validated_community_matrix` function to read in the validation file and extract a community matrix based on the expert validations, considering here both `Y` and `YM` as validated vocalizations, and using the combined results of the top-2 validation (i.e., detections_validated-1.xlsx` and `detections_validated-2.xlsx`).
 
 ```{r}
 Y.expert = BirdPipe::extract_validated_community_matrix(BirdPipe.data = BirdPipe.data,
-                                      manual.validation.file = "detections_validated.xlsx",
-                                             validated = c("Y","YM"))
+                                      manual.validation.file = "detections_validated",
+                                      n = 2,
+                                      validated = c("Y","YM"))
 kable(Y.expert , caption = "Community data matrix based on expert validation")
 ```
 
-This matrix contains ones for cases where the species was detected by edge computing and was validated by an expert. We may multiply this matrix with the matrix `Y.edge.computing` to keep the abundance about how many times each species was detected, yet keeping only segment-species combinations for which there is a validated detection. We also remove species for which there are no validated detections. This results in the final community data matrix that we recommend to be used as a starting point for downstream analyses. 
+This matrix contains ones for cases where the species was detected by edge computing and was validated by an expert. We may multiply this matrix with the matrix `Y.edge.computing` to keep the abundance about how many times each species was detected, yet keeping only sampling event-species combinations for which there is a validated detection. We also remove species for which there are no validated detections. This results in the final community data matrix that we recommend to be used as a starting point for downstream analyses. 
 
 ```{r}
 Y = Y.edge.computing*Y.expert
@@ -168,4 +173,12 @@ Y = Y[,colSums(Y)>0]
 kable(Y, caption = "Final community data matrix for downstream analyses")
 ```
 
-We note that even if the expert would not make any mistakes in the manual validation, the final community data  matrix can still contain errors. Most importantly, the matrix may contain false negatives, i.e., zero entries even if the species was actually there. This can happen if edge computing did not detect the species to start with, in which case the species was not included in manual validation. It can also happen if the classification with highest probability did not actually represent the species, but some other classification with lower probability would actually have represented the species. If the expert did not make any mistakes, there are no false positives in the sense that all non-zero entries correspond to actual presence of the species. However, the number of recordings in which the species is present is based on edge computing only, and hence likely to contain errors. In spite of these error sources, we consider the community data matrix constructed by the here illustrated procedure as a robust starting point for downstream analyses. To further reduce the possibility of errors, more extensive manual validation can be made, e.g. by listening through 10 tentative vocalizations per species and per segment and/or listening through a subset of audiofiles in their full length.
+We note that even if the expert would not make any mistakes in the manual validation, the final community data  matrix can still contain errors. Most importantly, the matrix may contain false negatives, i.e., zero entries even if the species was actually there. This can happen if edge computing did not detect the species to start with, in which case the species was not included in manual validation. It can also happen if the classification with top-n highest classification scores did not actually represent the species, but some other classification with lower score would actually have represented the species. In spite of these limitations, we consider the community data matrix constructed by the here illustrated procedure as a robust starting point for downstream analyses. Most importantly, if the expert did not make any mistakes, there are no false positives in the sense that all non-zero entries correspond to actual presence of the species.
+
+For more advanced analyses, the function `calibrate_classifier` provides functionality to parameterize a detection model that converts classification scores to calibrated detection probabilities. While the example data do not contain a sufficient number of samples for finalizing the calibration process, the script below can be used to start the calibration process.
+
+```{r,eval=FALSE}
+BirdPipe::calibrate_classifier(BirdPipe.data = BirdPipe.data, 
+                               BirdPipe.folder = BirdPipe.folder,
+                               species = "Eurasian Bullfinch")
+```
